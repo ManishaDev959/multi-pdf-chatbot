@@ -1,0 +1,31 @@
+# Virtual environment
+venv/
+.venv/
+ENV/
+env/
+
+# Environment variables / secrets
+.env
+.env.*
+
+# Python caches and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+
+# Local app data generated at runtime
+uploads/
+chroma_db/
+*.db
+*.sqlite3
+
+# IDE / editor folders
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log
