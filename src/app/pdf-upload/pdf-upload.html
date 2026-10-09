@@ -1,0 +1,131 @@
+<main class="upload-page">
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <section class="upload-content" aria-labelledby="page-title">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M9 3.5h9l7 7V26a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 7 26V6a2.5 2.5 0 0 1 2-2.5Z" />
+        <path d="M18 4v7h7M11 18h10M11 22h7" />
+      </svg>
+    </div>
+
+    <p class="eyebrow">YOUR DOCUMENTS, IN ONE PLACE</p>
+    <h1 id="page-title">PDF <span>Loader</span></h1>
+    <p class="intro">Bring your documents in. We’ll take it from here.</p>
+
+    <div class="upload-card">
+      <label class="drop-zone" for="pdf-files">
+        <input
+          id="pdf-files"
+          class="visually-hidden"
+          type="file"
+          accept=".pdf,application/pdf"
+          multiple
+          (change)="onFilesSelected($event)"
+        />
+        <span class="upload-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3" />
+          </svg>
+        </span>
+        <span class="drop-title">Choose your PDF files</span>
+        <span class="drop-hint">Select one or more documents from your device</span>
+        <span class="file-type">PDF FILES</span>
+      </label>
+
+      @if (selectedFiles.length > 0) {
+        <div class="selected-files" aria-live="polite">
+          <p class="file-count">{{ selectedFiles.length }} {{ selectedFiles.length === 1 ? 'file' : 'files' }} ready to upload</p>
+          <ul>
+            @for (file of selectedFiles; track $index) {
+              <li>
+                <span class="file-badge" aria-hidden="true">PDF</span>
+                <span class="file-name" [title]="file.name">{{ file.name }}</span>
+                <span class="file-size">{{ (file.size / 1024 / 1024).toFixed(1) }} MB</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      <button
+        class="upload-button"
+        type="button"
+        (click)="upload()"
+        [disabled]="loading() || selectedFiles.length === 0"
+      >
+        @if (loading()) {
+          <span class="spinner" aria-hidden="true"></span>
+          Uploading your files…
+        } @else {
+          Upload PDFs
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h12m-5-5 5 5-5 5" />
+          </svg>
+        }
+      </button>
+
+      @if (message()) {
+        <p class="status-message" [class.success]="messageType() === 'success'" [class.error]="messageType() === 'error'" [attr.role]="messageType() === 'error' ? 'alert' : 'status'" aria-live="polite">
+          {{ message() }}
+        </p>
+      }
+    </div>
+
+    @if (uploadedFiles().length > 0) {
+      <section class="question-card" aria-labelledby="question-title">
+        <div class="question-heading">
+          <span class="ready-indicator" [class.processing]="indexing" [class.failed]="!hasReadyFiles && !indexing" aria-hidden="true"></span>
+          <div>
+            <h2 id="question-title">Ask your PDFs</h2>
+            <p>{{ hasReadyFiles ? 'Ask a question about the documents you uploaded.' : 'Your PDF is uploaded. Questions will be available when preparation is complete.' }}</p>
+          </div>
+        </div>
+
+        <form class="question-form" (ngSubmit)="askQuestion()">
+          <label class="visually-hidden" for="pdf-question">Your question</label>
+          <input
+            id="pdf-question"
+            name="question"
+            type="text"
+            [(ngModel)]="question"
+            [placeholder]="hasReadyFiles ? 'What would you like to know?' : 'PDF preparation in progress…'"
+            autocomplete="off"
+            [disabled]="searching() || !hasReadyFiles"
+          />
+          <button type="submit" [disabled]="searching() || !hasReadyFiles || !question.trim()">
+            @if (searching()) {
+              <span class="spinner question-spinner" aria-hidden="true"></span>
+              Searching…
+            } @else {
+              Ask
+            }
+          </button>
+        </form>
+
+        @if (questionMessage()) {
+          <p class="question-message" [class.error]="questionMessageType() === 'error'" [attr.role]="questionMessageType() === 'error' ? 'alert' : 'status'" aria-live="polite">{{ questionMessage() }}</p>
+        }
+
+        @if (searchResults().length > 0) {
+          <div class="answers" aria-live="polite">
+            @for (result of searchResults(); track $index) {
+              <article class="answer">
+                <p>{{ result.text }}</p>
+                <footer>{{ result.source }} <span>·</span> Page {{ result.page }}</footer>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <p class="privacy-note">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M4 7V5a4 4 0 0 1 8 0v2m-9 0h10v7H3V7Z" />
+      </svg>
+      Your files are handled securely
+    </p>
+  </section>
+</main>
