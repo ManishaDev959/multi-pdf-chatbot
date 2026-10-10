@@ -12,12 +12,18 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["http://localhost:4200", "https://wonderful-dune-044c5f110.6.azurestaticapps.net/"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-os.makedirs("uploads", exist_ok=True)
+# os.makedirs("uploads", exist_ok=True)
+
+DATA_DIR = os.getenv("DATA_DIR", ".")
+UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
+CHROMA_DIR = os.path.join(DATA_DIR, "chroma_db")
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
@@ -58,7 +64,8 @@ async def upload(
 ):
     uploaded = []
     for file in files:
-        path = os.path.join("uploads", file.filename)
+        # path = os.path.join("uploads", file.filename)
+        path = os.path.join(UPLOAD_DIR, file.filename)
         with open(path, "wb") as f:
             shutil.copyfileobj(file.file, f)
 

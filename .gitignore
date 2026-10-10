@@ -3,6 +3,7 @@ venv/
 .venv/
 ENV/
 env/
+venv_old/
 
 # Environment variables / secrets
 .env
