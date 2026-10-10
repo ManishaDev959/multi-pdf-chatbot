@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription, switchMap, takeWhile, timer } from 'rxjs';
-
+// import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 interface UploadedFile {
   file: string;
   status: 'processing' | 'ready' | 'failed';
@@ -35,6 +36,7 @@ export class PdfUpload {
   loading = signal(false);
   searching = signal(false);
   private statusSubscription?: Subscription;
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient, private destroyRef: DestroyRef) {}
 
@@ -67,7 +69,8 @@ export class PdfUpload {
     this.message.set('');
     this.messageType.set('');
     this.loading.set(true);
-    this.http.post<UploadedFile[]>('http://localhost:8000/upload', formData)
+    // this.http.post<UploadedFile[]>('http://localhost:8000/upload', formData)
+    this.http.post<UploadedFile[]>(`${environment.apiUrl}/upload`, formData)
       .subscribe({
         next: (files) => {
           this.uploadedFiles.set(files);
@@ -86,7 +89,8 @@ export class PdfUpload {
 
   private checkIndexingStatus(filenames: string[]) {
     this.statusSubscription = timer(0, 1500).pipe(
-      switchMap(() => this.http.get<UploadedFile[]>('http://localhost:8000/upload/status', {
+      // switchMap(() => this.http.get<UploadedFile[]>('http://localhost:8000/upload/status', {
+      switchMap(() => this.http.get<UploadedFile[]>(`${environment.apiUrl}/upload/status`, {
         params: { files: filenames },
       })),
       takeWhile((files) => files.some((file) => file.status === 'processing'), true),
@@ -131,7 +135,8 @@ export class PdfUpload {
     this.searchResults.set([]);
     this.questionMessage.set('');
     this.questionMessageType.set('');
-    this.http.get<SearchResult[]>('http://localhost:8000/search', { params: { q: question } })
+    // this.http.get<SearchResult[]>('http://localhost:8000/search', { params: { q: question } })
+      this.http.get<SearchResult[]>('http://localhost:8000/search', { params: { q: question } })
       .subscribe({
         next: (results) => {
           this.searchResults.set(results);
